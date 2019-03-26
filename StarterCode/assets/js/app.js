@@ -6,10 +6,14 @@
 // MOE = margin of error
 
 //////// Chart Params //////////
-
-var svgWidth = 500;
-var svgHeight = 500;
-var margin = {top: 20, right: 20, bottom: 20, left: 20};
+var svgWidth = 600;
+var svgHeight = 400;
+var margin = {
+    top: 20,
+    right: 20,
+    bottom: 20,
+    left: 20
+};
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 
@@ -23,7 +27,7 @@ var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 ////////// Load data from data.csv //////////
-d3.csv("/StarterCode/assets/data/data.csv").then(function(healthData) {
+d3.csv("/StarterCode/assets/data/data.csv").then(function (healthData) {
     healthData.forEach(function (d) {
         // d.age = +d.age;
         // d.ageMoe = +d.ageMoe;
@@ -42,16 +46,14 @@ d3.csv("/StarterCode/assets/data/data.csv").then(function(healthData) {
         // d.smokesLow = +d.smokesLow;
     });
 
-    console.log()
-
     ////////// Scales (x & y to chart width & height) //////////
     var yLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(healthData, d => d.healthcare)])
-    .range([height, 0]);
+        .domain([4, d3.max(healthData, d => d.healthcare)])
+        .range([height, 0]);
 
     var xLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(healthData, d => d.poverty)])
-    .range([0, width])
+        .domain([8, d3.max(healthData, d => d.poverty)])
+        .range([0, width]);
 
     ////////// Create Axes from Scales //////////
     var yAxis = d3.axisLeft(yLinearScale);
@@ -59,15 +61,62 @@ d3.csv("/StarterCode/assets/data/data.csv").then(function(healthData) {
 
     ////////// Append the Axes to the Chart //////////
     chartGroup.append("g")
-    .attr("transform", `translate(0, ${height})`)
-    .call(xAxis);
+        .call(yAxis);
 
     chartGroup.append("g")
-    .call(yAxis);
+        .attr("transform", `translate(0, ${height})`)
+        .call(xAxis);
 
-// Poverty Min & Max: 9.2 and 21.5
-// Healthcare Min & Max: 4.6 and 24.9
+    ////////// Append Circles //////////
+    var circlesGroup = chartGroup.selectAll("circle")
+        .data(healthData)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLinearScale(d.poverty))
+        .attr("cy", d => yLinearScale(d.healthcare))
+        .attr("r", "12")
+        .classed("stateCircle", true)
+        .attr("stroke-width", "1");
 
+    ////////// Append Circle Text //////////
+    var textGroup = chartGroup.selectAll('circle.text')
+        .data(healthData)
+        .enter()
+        .append("text")
+        .attr("x", d => xLinearScale(d.poverty))
+        .attr("y", d => yLinearScale(d.healthcare))
+        .attr("dy", 5)
+        .classed("stateText", true)
+        .attr("font-size", "10px")
+        .text(function (d) {
+            return d.abbr;
+        });
+
+    ////////// Append a Tooltip div //////////
+    var toolTip = d3.select("body")
+        .append("div")
+        .classed("d3-tip", true);
+
+
+    ////////// Create a Mouse Over/Out Event  //////////
+    circlesGroup.on("mouseover", function (d) {
+            toolTip.style("display", "block")
+                .html(`<strong>${d.state}<strong><hr><>Poverty: ${d.poverty}%`)
+                .style("left", d3.event.pageX + "px")
+                .style("top", d3.event.pageY + "px");
+        })
+
+        .on("mouseout", function () {
+            toolTip.style("display", "none");
+        });
+
+
+// Currently can pull the poverty stats, but it shows up in the footer
+
+// circlesGroup is going into the body, then appending the div at the very bottom
+// which is where it currently is located
+
+// need to move it into the section where the svg is located (at the top of the page)
 
 
 
