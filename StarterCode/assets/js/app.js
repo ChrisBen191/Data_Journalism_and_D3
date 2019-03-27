@@ -101,7 +101,7 @@ d3.csv("/StarterCode/assets/data/data.csv").then(function (healthData) {
     ////////// Create a Mouse Over/Out Event  //////////
     circlesGroup.on("mouseover", function (d) {
             toolTip.style("display", "block")
-                .html(`<strong>${d.state}<strong><hr><>Poverty: ${d.poverty}%`)
+                .html(`<strong>${d.state}<strong><br>Poverty: ${d.poverty}% <br>Healthcare Rate: ${d.healthcareLow}% - ${d.healthcareHigh}%`)
                 .style("left", d3.event.pageX + "px")
                 .style("top", d3.event.pageY + "px");
         })
