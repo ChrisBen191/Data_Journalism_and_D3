@@ -92,8 +92,10 @@ d3.csv("/StarterCode/assets/data/data.csv").then(function (healthData) {
             return d.abbr;
         });
 
+
+
     ////////// Append a Tooltip div //////////
-    var toolTip = d3.select("body")
+    var toolTip = d3.select("div.row")
         .append("div")
         .classed("d3-tip", true);
 
@@ -102,13 +104,16 @@ d3.csv("/StarterCode/assets/data/data.csv").then(function (healthData) {
     circlesGroup.on("mouseover", function (d) {
             toolTip.style("display", "block")
                 .html(`<strong>${d.state}<strong><br>Poverty: ${d.poverty}% <br>Healthcare Rate: ${d.healthcareLow}% - ${d.healthcareHigh}%`)
-                .style("left", d3.event.pageX + "px")
-                .style("top", d3.event.pageY + "px");
+                // .style("left", d + "px")
+                // .style("top", d + "px")
+                .style("left", d3.select(this).attr("cx") + "px")     
+                .style("top", d3.select(this).attr("cy") + "px");
         })
 
         .on("mouseout", function () {
             toolTip.style("display", "none");
         });
+
 
 
 // Currently can pull the poverty stats, but it shows up in the footer
